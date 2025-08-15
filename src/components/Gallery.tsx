@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 interface GallerySlide {
@@ -10,19 +10,16 @@ interface GallerySlide {
 }
 
 const Gallery = () => {
-  const slides: GallerySlide[] = useMemo(
-    () => [
-      { id: 1, image: '/images/dining.jpg', title: 'Dining room' },
-      { id: 2, image: '/images/coffee.jpg', title: 'Coffee bar' },
-      { id: 3, image: '/images/chef.jpg', title: 'Chef table' },
-      { id: 4, image: '/images/bar.jpg', title: 'Bar counter' },
-      { id: 5, image: '/images/table.jpg', title: 'Friends at table' },
-    ],
-    []
-  );
+  const slides: GallerySlide[] = [
+    { id: 1, image: '/images/dining.jpg', title: 'Dining room' },
+    { id: 2, image: '/images/coffee.jpg', title: 'Coffee bar' },
+    { id: 3, image: '/images/chef.jpg', title: 'Chef table' },
+    { id: 4, image: '/images/bar.jpg', title: 'Bar counter' },
+    { id: 5, image: '/images/table.jpg', title: 'Friends at table' },
+  ];
 
   const N = slides.length;
-  const loopSlides = useMemo(() => [...slides, ...slides, ...slides], [slides]);
+  const loopSlides = [...slides, ...slides, ...slides];
   const initialLogical = 2;
   const [index, setIndex] = useState(N + initialLogical);
   const [offset, setOffset] = useState(0);
@@ -99,13 +96,15 @@ const Gallery = () => {
   }, []);
 
   return (
-    <section id="gallery" className="relative py-20 sm:py-24 bg-gray-50 overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Overline & Title */}
-        <p className="text-center text-[11px] tracking-[0.2em] text-gray-400">GALLERY</p>
-        <h2 className="mt-2 text-center text-3xl sm:text-4xl font-bold text-gray-900">
-          Check <span className="text-orange-500">Our Gallery</span>
-        </h2>
+    <section id="gallery" className="py-20 bg-gray-50 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Title */}
+        <div className="text-center mb-12">
+          <p className="text-[11px] tracking-[0.2em] text-gray-400">GALLERY</p>
+          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
+            Check <span className="text-orange-500">Our Gallery</span>
+          </h2>
+        </div>
 
         {/* Viewport */}
         <div

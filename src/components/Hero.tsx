@@ -47,7 +47,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="home" className="relative h-screen overflow-hidden">
+    <section id="home" className="relative h-screen overflow-hidden scroll-mt-20">
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
           <div

@@ -7,16 +7,34 @@ interface BulletPoint {
   text: string;
 }
 
-interface AboutSectionProps {
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  introText?: string;
-  bulletPoints?: BulletPoint[];
-  phoneNumber?: string;
-  mainImage?: string;
-  secondaryMedia?: string; // Can be image path or YouTube URL
+interface AboutSectionData {
+  title: string;
+  subtitle: string;
+  description: string;
+  introText: string;
+  bulletPoints: BulletPoint[];
+  phoneNumber: string;
+  mainImage: string;
+  secondaryMedia: string; // Can be image path or YouTube URL
 }
+
+const defaultAboutSection: AboutSectionData = {
+  title: "Crafted with Heart, Served with Soul",
+  subtitle: "Seasonal ingredients, wood-fired flavors, and a little bit of home",
+  description:
+    "We’re a neighborhood kitchen inspired by simple, honest cooking. Our team sources peak-season produce, bakes fresh each morning, and slow-cooks stocks and sauces the old-fashioned way. Whether it’s a quiet weekday lunch or a lively dinner with friends, we want every plate to feel warm, generous, and thoughtfully made.",
+  introText:
+    "Step into our warm, inviting space where every detail has been thoughtfully crafted to create an unforgettable dining experience. From the moment you arrive, you'll feel the passion and dedication that goes into every aspect of our restaurant.",
+  bulletPoints: [
+    { id: '1', text: 'Locally sourced produce and sustainably raised meats, prepared fresh every day.' },
+    { id: '2', text: 'House-made pastas, breads, and desserts—crafted in small batches for maximum flavor.' },
+    { id: '3', text: 'Welcoming, unpretentious hospitality with a menu that changes with the seasons.' },
+  ],
+  phoneNumber: "+1 2233 44556 77",
+  mainImage: "/images/dining.jpg",
+  secondaryMedia: "https://youtu.be/kRCH8kD1GD0?si=MN-xp3NEBRS2fLtD",
+};
+
 
 // Helper function to check if string is a YouTube URL
 function isYouTubeUrl(url: string): boolean {
@@ -30,22 +48,13 @@ function getYouTubeVideoId(url: string): string | null {
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
-export default function AboutSection({
-  title = "Crafted with Heart, Served with Soul",
-  subtitle = "Seasonal ingredients, wood-fired flavors, and a little bit of home",
-  description = "We’re a neighborhood kitchen inspired by simple, honest cooking. Our team sources peak-season produce, bakes fresh each morning, and slow-cooks stocks and sauces the old-fashioned way. Whether it’s a quiet weekday lunch or a lively dinner with friends, we want every plate to feel warm, generous, and thoughtfully made.",
-  introText = "Step into our warm, inviting space where every detail has been thoughtfully crafted to create an unforgettable dining experience. From the moment you arrive, you'll feel the passion and dedication that goes into every aspect of our restaurant.",
-  bulletPoints = [
-    { id: '1', text: 'Locally sourced produce and sustainably raised meats, prepared fresh every day.' },
-    { id: '2', text: 'House-made pastas, breads, and desserts—crafted in small batches for maximum flavor.' },
-    { id: '3', text: 'Welcoming, unpretentious hospitality with a menu that changes with the seasons.' }
-  ],
-  phoneNumber = "+1 2233 44556 77",
-  mainImage = "/images/dining.jpg",
-  secondaryMedia = "https://youtu.be/kRCH8kD1GD0?si=MN-xp3NEBRS2fLtD"
-}: AboutSectionProps) {
-  const isVideo = isYouTubeUrl(secondaryMedia);
-  const videoId = isVideo ? getYouTubeVideoId(secondaryMedia) : null;
+
+export default function AboutSection(props: Partial<AboutSectionData> = {}) {
+  // Merge defaults with incoming props (keeps compatibility with your previous API)
+  const data: AboutSectionData = { ...defaultAboutSection, ...props };
+
+  const isVideo = isYouTubeUrl(data.secondaryMedia);
+  const videoId = isVideo ? getYouTubeVideoId(data.secondaryMedia) : null;
 
   return (
     <section id="about" className="py-20 bg-gray-50 scroll-mt-20">
@@ -54,16 +63,16 @@ export default function AboutSection({
         <div className="text-center mb-12">
           <p className="text-[11px] tracking-[0.2em] text-gray-400">ABOUT US</p>
           <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
-            {title.includes('Our Story') ? (
+            {data.title.includes('Our Story') ? (
               <>
                 Discover <span className="text-orange-500">Our Story</span>
               </>
             ) : (
-              title
+              data.title
             )}
           </h2>
           <p className="font-body text-xl text-gray-600 mt-4">
-            {subtitle}
+            {data.subtitle}
           </p>
         </div>
 
@@ -73,7 +82,7 @@ export default function AboutSection({
           <div className="space-y-6">
             <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-lg">
               <Image
-                src={mainImage}
+                src={data.mainImage}
                 alt="Restaurant dining area"
                 fill
                 className="object-cover"
@@ -85,10 +94,10 @@ export default function AboutSection({
             <div className="rounded-xl border-2 border-orange-500 px-6 py-6 text-center bg-white shadow-lg">
               <div className="text-gray-800 font-medium text-lg">Book a Table</div>
               <a
-                href={`tel:${phoneNumber.replace(/\s/g, '')}`}
+                href={`tel:${data.phoneNumber.replace(/\s/g, '')}`}
                 className="mt-2 inline-block text-2xl font-bold text-orange-600 tracking-wide hover:text-orange-700 transition-colors"
               >
-                {phoneNumber}
+                {data.phoneNumber}
               </a>
             </div>
           </div>
@@ -96,11 +105,11 @@ export default function AboutSection({
           {/* bullet list */}
           <div className="space-y-6">
             <p className="text-gray-600 leading-relaxed font-body text-lg">
-              {introText}
+              {data.introText}
             </p>
 
             <ul className="space-y-4">
-              {bulletPoints.map((point) => (
+              {data.bulletPoints.map((point) => (
                 <Bullet key={point.id}>
                   {point.text}
                 </Bullet>
@@ -108,7 +117,7 @@ export default function AboutSection({
             </ul>
 
             <p className="text-gray-700 leading-relaxed font-body">
-              {description}
+              {data.description}
             </p>
 
             {/* Secondary Media - Image or YouTube Video */}
@@ -117,16 +126,15 @@ export default function AboutSection({
                 // YouTube Video Player
                 <iframe
                   src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
-                  title="About our restaurant"
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               ) : (
-                // Image with Play Button (for non-video media)
+                // Image (for non-video media)
                 <>
                   <Image
-                    src={secondaryMedia}
+                    src={data.secondaryMedia}
                     alt="Restaurant media"
                     fill
                     className="object-cover"

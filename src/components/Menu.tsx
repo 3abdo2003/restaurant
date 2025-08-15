@@ -41,10 +41,10 @@ const menuData: MenuItem[] = [
   { id: 'cannoli', name: 'Sicilian Cannoli', description: 'Crispy shells filled with sweet ricotta and chocolate chips', price: '$8.99', image: 'images/cannoli.jpg', category: 'desserts' },
 ];
 
-export default function Menu() {
+const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState<MenuItem['category']>('specials');
   const [activeCategory, setActiveCategory] = useState('specials');
-  const [activeItem, setActiveItem] = useState<string | null>(null); // mobile tap state
+  const [activeItem, setActiveItem] = useState<string | null>(null);
 
   const navItems = [
     { id: 'specials', label: 'Specials', category: 'specials' },
@@ -57,7 +57,13 @@ export default function Menu() {
   const filteredItems = menuData.filter(item => item.category === selectedCategory);
 
   const handleItemClick = (id: string) => {
-    setActiveItem(prev => (prev === id ? null : id)); // toggles and closes previous
+    setActiveItem(prev => (prev === id ? null : id));
+  };
+
+  const handleCategoryClick = (category: string, categoryType: MenuItem['category']) => {
+    setActiveCategory(category);
+    setSelectedCategory(categoryType);
+    setActiveItem(null);
   };
 
   return (
@@ -66,8 +72,9 @@ export default function Menu() {
         
         {/* Section Title */}
         <div className="text-center mb-12">
-          <h2 className="font-display text-4xl font-bold text-gray-900 mb-4">Our Menu</h2>
-          <p className="font-body text-xl text-gray-600">Discover our delicious dishes</p>
+          <p className="text-[11px] tracking-[0.2em] text-gray-400">MENU</p>
+          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">Our Menu</h2>
+          <p className="font-body text-xl text-gray-600 mt-4">Discover our delicious dishes</p>
         </div>
 
         {/* Category Navigation */}
@@ -77,11 +84,7 @@ export default function Menu() {
             return (
               <div key={item.id} className="relative flex flex-col items-center">
                 <button
-                  onClick={() => {
-                    setActiveCategory(item.id);
-                    setSelectedCategory(item.category);
-                    setActiveItem(null); // close any open overlay
-                  }}
+                  onClick={() => handleCategoryClick(item.id, item.category)}
                   className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
                     isActive ? 'bg-orange-600 text-white' : 'text-gray-500 hover:text-orange-600'
                   }`}
@@ -118,7 +121,7 @@ export default function Menu() {
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
 
-                {/* Overlay: hover (desktop) or active (mobile) */}
+                {/* Overlay*/}
                 <div
                   className={`absolute inset-0 bg-black/60 flex flex-col justify-center items-center text-center p-4 transition-opacity duration-300 ${
                     isMobileActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
@@ -141,4 +144,6 @@ export default function Menu() {
       </div>
     </section>
   );
-}
+};
+
+export default Menu;
