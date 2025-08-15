@@ -44,6 +44,7 @@ const menuData: MenuItem[] = [
 export default function Menu() {
   const [selectedCategory, setSelectedCategory] = useState<MenuItem['category']>('specials');
   const [activeCategory, setActiveCategory] = useState('specials');
+  const [activeItem, setActiveItem] = useState<string | null>(null); // mobile tap state
 
   const navItems = [
     { id: 'specials', label: 'Specials', category: 'specials' },
@@ -55,9 +56,14 @@ export default function Menu() {
 
   const filteredItems = menuData.filter(item => item.category === selectedCategory);
 
+  const handleItemClick = (id: string) => {
+    setActiveItem(prev => (prev === id ? null : id)); // toggles and closes previous
+  };
+
   return (
     <section id="menu" className="py-20 bg-gray-50 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Section Title */}
         <div className="text-center mb-12">
           <h2 className="font-display text-4xl font-bold text-gray-900 mb-4">Our Menu</h2>
@@ -74,6 +80,7 @@ export default function Menu() {
                   onClick={() => {
                     setActiveCategory(item.id);
                     setSelectedCategory(item.category);
+                    setActiveItem(null); // close any open overlay
                   }}
                   className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
                     isActive ? 'bg-orange-600 text-white' : 'text-gray-500 hover:text-orange-600'
@@ -94,27 +101,36 @@ export default function Menu() {
 
         {/* Menu Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="group relative h-80 rounded-xl overflow-hidden shadow-lg cursor-pointer"
-            >
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                unoptimized
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
+          {filteredItems.map((item) => {
+            const isMobileActive = activeItem === item.id;
 
-              {/* Hover Overlay with Info */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-4">
-                <h3 className="text-white font-display text-xl font-bold mb-2">{item.name}</h3>
-                <p className="text-white text-sm mb-4">{item.description}</p>
-                <span className="bg-orange-600 text-white px-4 py-1 rounded-lg font-semibold">{item.price}</span>
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleItemClick(item.id)}
+                className="group relative h-80 rounded-xl overflow-hidden shadow-lg cursor-pointer"
+              >
+                <Image
+                  src={`/${item.image}`}
+                  alt={item.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+
+                {/* Overlay: hover (desktop) or active (mobile) */}
+                <div
+                  className={`absolute inset-0 bg-black/60 flex flex-col justify-center items-center text-center p-4 transition-opacity duration-300 ${
+                    isMobileActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                >
+                  <h3 className="text-white font-display text-xl font-bold mb-2">{item.name}</h3>
+                  <p className="text-white text-sm mb-4">{item.description}</p>
+                  <span className="bg-orange-600 text-white px-4 py-1 rounded-lg font-semibold">{item.price}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {filteredItems.length === 0 && (

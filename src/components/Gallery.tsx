@@ -96,7 +96,6 @@ const Gallery = () => {
     if (containerRef.current) ro.observe(containerRef.current);
     if (trackRef.current) ro.observe(trackRef.current);
     return () => ro.disconnect();
-
   }, []);
 
   return (
@@ -149,11 +148,13 @@ const Gallery = () => {
                   >
                     <Image
                       src={slide.image}
-                      alt={slide.image}
+                      alt={slide.title}
                       fill
-                      unoptimized
-                      className="object-cover"
+                      placeholder="blur" // smooth blur-up loading
+                      blurDataURL={`${slide.image}?w=20&q=10`} // tiny preview for instant render
+                      priority={i < 3} // preload first few images
                       sizes="(max-width: 768px) 76vw, 260px"
+                      className="object-cover"
                     />
                     <div
                       className={`absolute inset-0 pointer-events-none ${
