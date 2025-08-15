@@ -4,7 +4,6 @@ import Menu from '@/components/Menu';
 import Gallery from '@/components/Gallery';
 import About from '@/components/About';
 import MenuTwo from '@/components/MenuTwo';
-import Products from '@/components/ProductCard';
 
 
 export default function Home() {
