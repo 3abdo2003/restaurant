@@ -99,7 +99,6 @@ export default function Menu() {
               key={item.id}
               className="group relative h-80 rounded-xl overflow-hidden shadow-lg cursor-pointer"
             >
-              {/* Image */}
               <Image
                 src={item.image}
                 alt={item.name}

@@ -89,7 +89,6 @@ const Gallery = () => {
     } else {
       recalcOffset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, N]);
 
   useEffect(() => {
@@ -97,7 +96,7 @@ const Gallery = () => {
     if (containerRef.current) ro.observe(containerRef.current);
     if (trackRef.current) ro.observe(trackRef.current);
     return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   return (

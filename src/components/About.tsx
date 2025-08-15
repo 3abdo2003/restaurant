@@ -69,7 +69,7 @@ export default function AboutSection({
 
         {/* 2-column layout */}
         <div className="grid gap-8 lg:grid-cols-2 items-start">
-          {/* LEFT: big image + CTA box */}
+          {/*big image*/}
           <div className="space-y-6">
             <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-lg">
               <Image
@@ -81,7 +81,7 @@ export default function AboutSection({
               />
             </div>
 
-            {/* CTA bordered box */}
+            {/* CTA box */}
             <div className="rounded-xl border-2 border-orange-500 px-6 py-6 text-center bg-white shadow-lg">
               <div className="text-gray-800 font-medium text-lg">Book a Table</div>
               <a
@@ -93,7 +93,7 @@ export default function AboutSection({
             </div>
           </div>
 
-          {/* RIGHT: copy + bullet list + secondary media (image or video) */}
+          {/* bullet list */}
           <div className="space-y-6">
             <p className="text-gray-600 leading-relaxed font-body text-lg">
               {introText}
@@ -131,18 +131,6 @@ export default function AboutSection({
                     fill
                     className="object-cover"
                   />
-                  <button
-                    aria-label="Play video"
-                    className="absolute inset-0 m-auto h-16 w-16 rounded-full bg-orange-600/90 flex items-center justify-center shadow-lg ring-2 ring-white/70 hover:bg-orange-700/90 transition-colors"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-7 w-7 fill-white"
-                      aria-hidden="true"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
                 </>
               )}
             </div>
@@ -153,7 +141,7 @@ export default function AboutSection({
   );
 }
 
-/** Red check bullet item */
+/** check bullet item */
 function Bullet({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-3">
