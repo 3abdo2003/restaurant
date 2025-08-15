@@ -44,6 +44,10 @@ const Gallery = () => {
     setIndex(best);
   };
 
+  const nextSlide = () => setIndex((i) => i + 1);
+  const prevSlide = () => setIndex((i) => i - 1);
+
+  // Auto-slide
   useEffect(() => {
     if (paused || document.hidden) return;
     const t = setInterval(() => setIndex((i) => i + 1), 5000);
@@ -95,20 +99,60 @@ const Gallery = () => {
     return () => ro.disconnect();
   }, []);
 
+  // Swipe handling
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      setPaused(true);
+      touchStartX.current = e.touches[0].clientX;
+      touchDeltaX.current = 0;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+    };
+
+    const onTouchEnd = () => {
+      const threshold = 50;
+      if (touchDeltaX.current > threshold) {
+        prevSlide();
+      } else if (touchDeltaX.current < -threshold) {
+        nextSlide();
+      }
+      setTimeout(() => setPaused(false), 300);
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    el.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
+
   return (
     <section id="gallery" className="py-20 bg-gray-50 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
+        {/* Title */}
         <div className="text-center mb-12">
           <p className="text-[11px] tracking-[0.2em] text-gray-400">GALLERY</p>
-          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">Check <span className="text-orange-500">Our Gallery</span>
+          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
+            Check <span className="text-orange-500">Our Gallery</span>
           </h2>
         </div>
 
         {/* Viewport */}
         <div
           ref={containerRef}
-          className="mt-10 relative overflow-hidden select-none py-4 mx-auto max-w-[980px]"
+          className="mt-10 relative overflow-hidden select-none py-4 mx-auto max-w-[980px] [touch-action:pan-y]"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
@@ -132,17 +176,12 @@ const Gallery = () => {
                   className="shrink-0"
                 >
                   <div
-                    className={
-                      `relative overflow-hidden rounded-2xl bg-black/10
+                    className={`relative overflow-hidden rounded-2xl bg-black/10
                        w-[min(300px,80vw)] aspect-[4/3] shrink-0
-                       transform-gpu will-change-transform
-                       transition-[transform,box-shadow,filter] duration-300 ease-out
-                       motion-reduce:transition-none motion-reduce:transform-none
+                       transition-all duration-300 ease-out
                        ${isActive
-                         ? 'scale-105 border-4 border-orange-500 shadow-2xl shadow-orange-500/10'
-                         : 'scale-95 border-0 shadow-md opacity-90 hover:scale-100 hover:shadow-lg'}
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white`
-                    }
+                         ? 'scale-105 border-4 border-orange-500'
+                         : 'scale-95 opacity-90 hover:scale-100 hover:shadow-lg'}`}
                   >
                     <Image
                       src={slide.image}
@@ -151,14 +190,6 @@ const Gallery = () => {
                       priority
                       className="object-cover"
                     />
-                    <div
-                      className={`absolute inset-0 pointer-events-none ${
-                        isActive ? 'bg-black/10' : 'bg-black/0'
-                      }`}
-                    />
-                    {isActive && (
-                      <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/20" />
-                    )}
                   </div>
                 </button>
               );
@@ -174,7 +205,9 @@ const Gallery = () => {
               onClick={() => goToLogical(i)}
               aria-label={`Go to slide ${i + 1}`}
               className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                logicalActive === i ? 'bg-orange-500 scale-110' : 'bg-gray-300 hover:bg-gray-400'
+                logicalActive === i
+                  ? 'bg-orange-500 scale-110'
+                  : 'bg-gray-300 hover:bg-gray-400'
               }`}
             />
           ))}

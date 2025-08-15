@@ -87,7 +87,7 @@ const MenuTwo = () => {
           <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
             Our <span className="text-orange-500">Menu</span>
           </h2>
-          <p className="font-body text-xl text-gray-600 mt-4">Hover to preview the dish card</p>
+          <p className="font-body text-xl text-gray-600 mt-4">Discover our delicious dishes</p>
         </div>
 
         {/* Category Navigation — horizontal only, no vertical scroll */}

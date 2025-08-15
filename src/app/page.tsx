@@ -4,6 +4,8 @@ import Menu from '@/components/Menu';
 import Gallery from '@/components/Gallery';
 import About from '@/components/About';
 import MenuTwo from '@/components/MenuTwo';
+import ProductCard from '@/components/ProductCard';
+import ProductCardTwo from '@/components/ProductCardTwo';
 
 
 export default function Home() {
@@ -12,6 +14,8 @@ export default function Home() {
         <Hero />
         <Menu />
         <MenuTwo />
+        <ProductCard />
+        <ProductCardTwo />
         <Gallery />
         <About />
     </div>
