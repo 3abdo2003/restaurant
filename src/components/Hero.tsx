@@ -62,7 +62,7 @@ const Hero = () => {
                 src={slide.image}
                 alt={slide.title}
                 fill
-                priority={index === 0}
+                priority
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-black/40" />

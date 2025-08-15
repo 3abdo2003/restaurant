@@ -149,10 +149,7 @@ const Gallery = () => {
                       src={slide.image}
                       alt={slide.title}
                       fill
-                      placeholder="blur" // smooth blur-up loading
-                      blurDataURL={`${slide.image}?w=20&q=10`} // tiny preview for instant render
-                      priority={i < 3} // preload first few images
-                      sizes="(max-width: 768px) 76vw, 260px"
+                      priority
                       className="object-cover"
                     />
                     <div
