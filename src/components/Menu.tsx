@@ -73,7 +73,7 @@ const Menu = () => {
         {/* Section Title */}
         <div className="text-center mb-12">
           <p className="text-[11px] tracking-[0.2em] text-gray-400">MENU</p>
-          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">Our Menu</h2>
+          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">Our <span className="text-orange-500">Menu</span></h2>
           <p className="font-body text-xl text-gray-600 mt-4">Discover our delicious dishes</p>
         </div>
 

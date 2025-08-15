@@ -101,8 +101,7 @@ const Gallery = () => {
         {/* Section Title */}
         <div className="text-center mb-12">
           <p className="text-[11px] tracking-[0.2em] text-gray-400">GALLERY</p>
-          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
-            Check <span className="text-orange-500">Our Gallery</span>
+          <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">Check <span className="text-orange-500">Our Gallery</span>
           </h2>
         </div>
 

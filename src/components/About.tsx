@@ -59,22 +59,26 @@ export default function AboutSection(props: Partial<AboutSectionData> = {}) {
   return (
     <section id="about" className="py-20 bg-gray-50 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Section Title */}
         <div className="text-center mb-12">
           <p className="text-[11px] tracking-[0.2em] text-gray-400">ABOUT US</p>
           <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
-            {data.title.includes('Our Story') ? (
+            {(() => {
+              const words = data.title.split(' ');
+              const lastTwo = words.splice(-2).join(' ');
+              return (
               <>
-                Discover <span className="text-orange-500">Our Story</span>
-              </>
-            ) : (
-              data.title
-            )}
-          </h2>
-          <p className="font-body text-xl text-gray-600 mt-4">
-            {data.subtitle}
-          </p>
-        </div>
+              {words.join(' ')}{' '}
+              <span className="text-orange-500">{lastTwo}</span>
+            </>
+          );
+        })()}
+      </h2>
+      <p className="font-body text-xl text-gray-600 mt-4">
+        {data.subtitle}
+      </p>
+    </div>
 
         {/* 2-column layout */}
         <div className="grid gap-8 lg:grid-cols-2 items-start">
