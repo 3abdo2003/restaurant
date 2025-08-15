@@ -41,12 +41,11 @@ const menuData: MenuItem[] = [
   { id: 'cannoli', name: 'Sicilian Cannoli', description: 'Crispy shells filled with sweet ricotta and chocolate chips', price: '$8.99', image: 'images/cannoli.jpg', category: 'desserts' },
 ];
 
-const Menu = () => {
+const MenuTwo = () => {
   const [selectedCategory, setSelectedCategory] = useState<MenuItem['category']>('specials');
   const [activeCategory, setActiveCategory] = useState('specials');
   const [activeItem, setActiveItem] = useState<string | null>(null);
 
-  // NEW: scroll container reference (for mobile auto-centering)
   const navScrollRef = useRef<HTMLDivElement | null>(null);
 
   const navItems = [
@@ -69,7 +68,7 @@ const Menu = () => {
     setActiveItem(null);
   };
 
-  // Auto-center active pill on mobile
+  // Auto-center active pill
   useEffect(() => {
     const container = navScrollRef.current;
     if (!container) return;
@@ -79,19 +78,19 @@ const Menu = () => {
   }, [activeCategory]);
 
   return (
-    <section id="menu" className="py-20 bg-gray-50 scroll-mt-20">
+    <section id="menu-two" className="py-20 bg-gray-50 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Section Title */}
         <div className="text-center mb-12">
           <p className="text-[11px] tracking-[0.2em] text-gray-400">MENU</p>
           <h2 className="mt-2 font-display text-4xl font-bold text-gray-900">
             Our <span className="text-orange-500">Menu</span>
           </h2>
-          <p className="font-body text-xl text-gray-600 mt-4">Discover our delicious dishes</p>
+          <p className="font-body text-xl text-gray-600 mt-4">Hover to preview the dish card</p>
         </div>
 
-        {/* Category Navigation — horizontal swipe, snap, auto-center, hidden scrollbars; arrow preserved */}
+        {/* Category Navigation — horizontal only, no vertical scroll */}
         <div
           ref={navScrollRef}
           className="
@@ -99,10 +98,10 @@ const Menu = () => {
             overflow-x-auto md:overflow-x-visible
             overflow-y-hidden md:overflow-y-visible
             whitespace-nowrap
-            [touch-action:pan-x]
+            [touch-action:pan-x]  /* lock touch to horizontal */
             [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
             snap-x snap-mandatory md:snap-none
-            px-1 md:px-0 pb-3
+            px-1 md:px-0 pb-3   /* pb gives room for the arrow so it doesn't trigger Y-scroll */
           "
           role="tablist"
           aria-label="Menu categories"
@@ -137,9 +136,14 @@ const Menu = () => {
         </div>
 
         {/* Menu Items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredItems.map((item) => {
-            const isMobileActive = activeItem === item.id;
+        <div
+          id={`panel-${activeCategory}`}
+          role="tabpanel"
+          aria-labelledby={`cat-${activeCategory}`}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {filteredItems.map((item, index) => {
+            const isActiveCard = activeItem === item.id;
 
             return (
               <div
@@ -147,23 +151,42 @@ const Menu = () => {
                 onClick={() => handleItemClick(item.id)}
                 className="group relative h-80 rounded-xl overflow-hidden shadow-lg cursor-pointer"
               >
+                {/* Background Image */}
                 <Image
                   src={`/${item.image}`}
                   alt={item.name}
                   fill
+                  priority={index === 0}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
 
-                {/* Overlay */}
+                {/* Dim/blur layer */}
                 <div
-                  className={`absolute inset-0 bg-black/60 flex flex-col justify-center items-center text-center p-4 transition-opacity duration-300 ${
-                    isMobileActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  className={`absolute inset-0 transition-opacity duration-300 backdrop-blur-[2px] ${
+                    isActiveCard ? 'opacity-100 bg-black/40' : 'opacity-0 group-hover:opacity-100 bg-black/30'
                   }`}
-                >
-                  <h3 className="text-white font-display text-xl font-bold mb-2">{item.name}</h3>
-                  <p className="text-white text-sm mb-4">{item.description}</p>
-                  <span className="bg-orange-600 text-white px-4 py-1 rounded-lg font-semibold">{item.price}</span>
+                />
+
+                {/* Clean Product Card */}
+                <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                  <div
+                    className={`
+                      w-full max-w-xs rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 p-5 text-left
+                      transition-all duration-300 transform
+                      ${isActiveCard
+                        ? 'opacity-100 scale-100 translate-y-0'
+                        : 'opacity-0 scale-95 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'}
+                    `}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-display text-lg font-semibold text-gray-900">{item.name}</h3>
+                      <span className="shrink-0 rounded-lg bg-orange-600 px-2.5 py-1 text-sm font-semibold text-white">
+                        {item.price}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-600">{item.description}</p>
+                  </div>
                 </div>
               </div>
             );
@@ -180,4 +203,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default MenuTwo;

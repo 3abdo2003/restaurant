@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 interface HeroSlide {
@@ -37,24 +37,75 @@ const Hero = () => {
     },
   ];
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  const goToSlide = (index: number) => setCurrentSlide(index);
+  const nextSlide = () => setCurrentSlide((p) => (p + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((p) => (p - 1 + slides.length) % slides.length);
+  const goToSlide = (i: number) => setCurrentSlide(i);
+
+  // Auto-advance (paused during interaction)
+  const isInteractingRef = useRef(false);
+  useEffect(() => {
+    if (isInteractingRef.current) return;
+    const id = setInterval(nextSlide, 5000);
+    return () => clearInterval(id);
+  }, [currentSlide]);
+
+  // Touch swipe (mobile drag)
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      isInteractingRef.current = true;
+      touchStartX.current = e.touches[0].clientX;
+      touchDeltaX.current = 0;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+    };
+
+    const onTouchEnd = () => {
+      const threshold = 50; // px to trigger swipe
+      if (touchDeltaX.current > threshold) prevSlide();
+      else if (touchDeltaX.current < -threshold) nextSlide();
+
+      // small cooldown so autoplay doesn’t fire immediately
+      setTimeout(() => {
+        isInteractingRef.current = false;
+      }, 300);
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    el.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
   }, []);
 
   return (
-    <section id="home" className="relative h-screen overflow-hidden scroll-mt-20">
-      <div className="relative w-full h-full">
+    <section
+      id="home"
+      className="relative h-[86svh] md:h-screen min-h-[520px] overflow-hidden scroll-mt-20"
+    >
+      <div
+        ref={containerRef}
+        className="relative w-full h-full select-none [touch-action:pan-y] md:[touch-action:auto]"
+      >
         {slides.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
               index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
             }`}
+            aria-hidden={index !== currentSlide}
           >
             {/* Background Image */}
             <div className="absolute inset-0">
@@ -62,32 +113,35 @@ const Hero = () => {
                 src={slide.image}
                 alt={slide.title}
                 fill
-                priority
+                priority={index === 0}
+                sizes="100vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 bg-black/40">
+                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/40 to-transparent" />
+              </div>
             </div>
 
             {/* Content */}
             <div className="relative z-20 flex flex-col md:flex-row items-center justify-center h-full px-4 sm:px-6">
-              {/* Text box */}
+              {/* Text box (you can tweak max-w/padding to size it on mobile) */}
               <div className="w-full md:w-1/2 flex items-center justify-center">
                 <div
                   className="
                     bg-black/60 backdrop-blur-sm rounded-xl 
-                    p-3 sm:p-4 md:p-8 
+                    p-3 sm:p-5 md:p-8 
                     shadow-2xl border-2 border-orange-500 
                     text-center md:text-left
-                    max-w-[260px] sm:max-w-sm md:max-w-lg
+                    max-w-[80vw] sm:max-w-sm md:max-w-lg
                   "
                 >
-                  <h3 className="text-base sm:text-lg md:text-3xl font-bold text-white mb-2">
+                  <h3 className="text-lg sm:text-xl md:text-3xl font-bold text-white mb-2 leading-snug">
                     {slide.title}
                   </h3>
-                  <p className="text-white text-xs sm:text-sm md:text-base leading-relaxed mb-4">
+                  <p className="text-white text-sm sm:text-base md:text-base leading-relaxed mb-4">
                     {slide.textBoxContent}
                   </p>
-                  <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-1.5 px-4 sm:py-2 sm:px-5 rounded-full text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg">
+                  <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-5 rounded-full text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg">
                     Discover More
                   </button>
                 </div>
@@ -100,35 +154,35 @@ const Hero = () => {
         ))}
       </div>
 
-      {/* Prev Button */}
+      {/* Prev/Next buttons — hidden on mobile, visible on md+ (desktop) */}
       <button
         onClick={prevSlide}
-        className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-orange-500 rounded-full hover:bg-orange-600 shadow-md transition-all"
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-orange-500 hover:bg-orange-600 shadow-md transition-all"
         aria-label="Previous slide"
       >
-        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
-      {/* Next Button */}
       <button
         onClick={nextSlide}
-        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-orange-500 rounded-full hover:bg-orange-600 shadow-md transition-all"
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-orange-500 hover:bg-orange-600 shadow-md transition-all"
         aria-label="Next slide"
       >
-        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-4 sm:bottom-6 w-full flex justify-center space-x-2 sm:space-x-3 z-30">
+      <div className="absolute bottom-4 sm:bottom-6 w-full flex justify-center gap-2.5 sm:gap-3 z-30">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+            aria-label={`Go to slide ${index + 1}`}
+            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
               currentSlide === index ? 'bg-orange-500 scale-110' : 'bg-gray-300 hover:bg-gray-400'
             }`}
           />
