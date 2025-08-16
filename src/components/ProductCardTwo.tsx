@@ -131,9 +131,9 @@ const ProductCardTwo = () => {
                         key={i}
                         className={`w-4 h-4 ${
                           i < Math.floor(product.rating)
-                            ? 'text-blue-600 fill-blue-600'
+                            ? 'text-yellow-500 fill-yellow-500'
                             : i < product.rating
-                            ? 'text-blue-600 fill-blue-600'
+                            ? 'text-yellow-500 fill-yellow-500'
                             : 'text-gray-300'
                         }`}
                       />
