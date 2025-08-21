@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Heart, Star } from 'lucide-react';
+import { Heart, Star, StarHalf } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -42,7 +42,7 @@ const products: Product[] = [
     rating: 4.8,
     reviews: '(900)',
   },
-    {
+  {
     id: 'pancakes',
     name: 'Pancakes',
     description: 'Fluffy pancakes with maple syrup.',
@@ -50,8 +50,8 @@ const products: Product[] = [
     image: 'images/pancakes.jpg',
     rating: 4.5,
     reviews: '(1.1k)',
-    },
-    {
+  },
+  {
     id: 'omelette',
     name: 'Omelette',
     description: 'Three-egg omelette with cheese and herbs.',
@@ -91,6 +91,11 @@ const ProductCardTwo = () => {
           {products.map(product => {
             const [amount, currency] = product.price.split(' ');
 
+            // Round rating to nearest 0.5
+            const roundedRating = Math.round(product.rating * 2) / 2;
+            const fullStars = Math.floor(roundedRating);
+            const hasHalfStar = roundedRating - fullStars === 0.5;
+
             return (
               <div
                 key={product.id}
@@ -126,18 +131,27 @@ const ProductCardTwo = () => {
 
                   {/* Rating */}
                   <div className="flex items-center gap-1 mt-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(product.rating)
-                            ? 'text-yellow-500 fill-yellow-500'
-                            : i < product.rating
-                            ? 'text-yellow-500 fill-yellow-500'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      if (i < fullStars) {
+                        return (
+                          <Star
+                            key={i}
+                            className="w-4 h-4 text-yellow-500 fill-yellow-500"
+                          />
+                        );
+                      } else if (i === fullStars && hasHalfStar) {
+                        return (
+                          <StarHalf
+                            key={i}
+                            className="w-4 h-4 text-yellow-500 fill-yellow-500"
+                          />
+                        );
+                      } else {
+                        return (
+                          <Star key={i} className="w-4 h-4 text-gray-300" />
+                        );
+                      }
+                    })}
                     <span className="text-gray-500 text-xs">{product.reviews}</span>
                   </div>
 
